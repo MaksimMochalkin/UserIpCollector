@@ -1,0 +1,6 @@
+@UserIpCollector_HostAddress = http://localhost:5167
+
+GET {{UserIpCollector_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
