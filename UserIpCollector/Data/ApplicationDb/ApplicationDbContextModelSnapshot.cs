@@ -25,10 +25,7 @@ namespace UserIpCollector.Data.ApplicationDb
             modelBuilder.Entity("UserIpCollector.Data.Entities.User", b =>
                 {
                     b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.HasKey("Id");
 

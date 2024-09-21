@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Reflection;
+using UserIpCollector.Abstractions.Interfaces;
 using UserIpCollector.Data;
 using UserIpCollector.Helpers;
 using UserIpCollector.Middleware;
+using UserIpCollector.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,10 +21,13 @@ builder.Services.AddDbContext<ApplicationDbContext>(config =>
     config.UseSqlServer(connectionString, sql => sql.MigrationsAssembly(migrationsAssembly));
 });
 
-builder.Services.AddMemoryCache();
+builder.Services.AddDistributedMemoryCache();
+//builder.Services.AddMemoryCache();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserIpAdresesService, UserIpAdresesService>();
 
 var app = builder.Build();
 

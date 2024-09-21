@@ -12,7 +12,7 @@ using UserIpCollector.Data;
 namespace UserIpCollector.Data.ApplicationDb
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240921065253_Initial")]
+    [Migration("20240921091039_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -28,10 +28,7 @@ namespace UserIpCollector.Data.ApplicationDb
             modelBuilder.Entity("UserIpCollector.Data.Entities.User", b =>
                 {
                     b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.HasKey("Id");
 

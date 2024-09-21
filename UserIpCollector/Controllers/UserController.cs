@@ -1,51 +1,69 @@
 ﻿namespace UserIpCollector.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
+    using System.ComponentModel.DataAnnotations;
     using UserIpCollector.Abstractions.Interfaces;
-    using UserIpCollector.Services;
+    using UserIpCollector.Requests;
 
     [ApiController]
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
-        private readonly IServiceManager _serviceManager;
+        private readonly IUserService _userService;
+        private readonly IUserIpAdresesService _userIpAdresesService;
         private readonly ILogger<UserController> _logger;
 
         public UserController(
-            IServiceManager serviceManager,
+            IUserService userService,
+            IUserIpAdresesService userIpAdresesService,
             ILogger<UserController> logger)
         {
-            _serviceManager = serviceManager;
+            _userService = userService;
+            _userIpAdresesService = userIpAdresesService;
             _logger = logger;
         }
 
-        //[HttpPost("connect")]
-        //public async Task<IActionResult> AddConnection([FromBody] ConnectionRequest request)
-        //{
-        //    await _cacheService.AddUserIpAsync(request.UserId, request.IpAddress);
-        //    await _userService.SaveConnectionToDbAsync(request.UserId, request.IpAddress);
-        //    return Ok();
-        //}
+        [HttpPost("init-user-connection")]
+        public async Task<IActionResult> InitUserConnection([FromBody] ConnectionRequest request)
+        {
+            _logger.LogTrace("InitUserConnection started");
+            var user = await _userService.CreateUserWithIp(request.UserId, request.IpAddress);
 
-        //[HttpGet("find-by-ip")]
-        //public async Task<IActionResult> FindUsersByIpPrefix([FromQuery] string ipPrefix)
-        //{
-        //    var users = await _cacheService.FindUsersByIpPrefixAsync(ipPrefix);
-        //    return Ok(users);
-        //}
+            await _userIpAdresesService.AddUserWithIpAsync(user);
+            return Ok("User with IP address created.");
+        }
 
-        //[HttpGet("{userId}/ips")]
-        //public async Task<IActionResult> GetUserIpAddresses(long userId)
-        //{
-        //    var ips = await _cacheService.GetUserIpsAsync(userId);
-        //    return Ok(ips);
-        //}
+        [HttpGet("find-by-ip")]
+        public async Task<IActionResult> FindUsersByIpPrefix(
+            [FromQuery][Required] string ipPrefix)
+        {
+            _logger.LogTrace("FindUsersByIpPrefix started");
+            var users = await _userIpAdresesService.FindUsersByIpPrefixAsync(ipPrefix);
+            _logger.LogTrace("FindUsersByIpPrefix finished");
 
-        //[HttpGet("{userId}/last-connection")]
-        //public async Task<IActionResult> GetLastConnection(long userId)
-        //{
-        //    var lastConnection = await _userService.GetLastConnectionAsync(userId);
-        //    return Ok(lastConnection);
-        //}
+            return Ok(users);
+        }
+
+        [HttpGet("{userId}/ips")]
+        public async Task<IActionResult> GetUserIpAddresses(
+            [FromQuery][Required] long userId)
+        {
+            _logger.LogTrace("GetUserIpAddresses started");
+            var ips = await _userIpAdresesService.GetUserIpsAsync(userId);
+            _logger.LogTrace("GetUserIpAddresses finished");
+
+            return Ok(ips);
+        }
+
+        [HttpGet("{userId}/last-connection")]
+        public async Task<IActionResult> GetLastConnection(
+            [FromQuery][Required] long userId)
+        {
+            _logger.LogTrace("GetLastConnection started");
+            var lastConnection = await _userService.GetLastConnectionAsync(userId);
+            _logger.LogTrace("GetLastConnection finished");
+
+            return Ok(lastConnection);
+        }
     }
 }
