@@ -2,10 +2,10 @@
 {
     using UserIpCollector.Data.Entities;
 
-    public interface IUserIpAdresesService
+    public interface IUserIpAdresesCacheService
     {
         Task<List<User>> FindUsersByIpPrefixAsync(string ipRange);
-        Task AddUserWithIpAsync(User user);
-        Task<List<UserIpAddress>> GetUserIpsAsync(long userId);
+        Task AddUserIpsAsync(User user);
+        Task<List<UserIpAddress>> GetAllIpsByUserIdAsync(long userId);
     }
 }

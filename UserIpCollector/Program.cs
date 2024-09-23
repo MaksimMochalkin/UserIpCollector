@@ -4,7 +4,9 @@ using System.Reflection;
 using UserIpCollector.Abstractions.Interfaces;
 using UserIpCollector.Data;
 using UserIpCollector.Helpers;
+using UserIpCollector.Managers;
 using UserIpCollector.Middleware;
+using UserIpCollector.Repositories;
 using UserIpCollector.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,8 +28,11 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IUserIpAdresesService, UserIpAdresesService>();
+builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
+builder.Services.AddScoped<IServiceManager, ServiceManager>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+//builder.Services.AddScoped<IUserService, UserService>();
+//builder.Services.AddScoped<IUserIpAdresesCacheService, UserIpAdresesCacheService>();
 
 var app = builder.Build();
 

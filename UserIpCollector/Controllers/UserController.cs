@@ -9,17 +9,14 @@
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
-        private readonly IUserService _userService;
-        private readonly IUserIpAdresesService _userIpAdresesService;
+        private readonly IServiceManager _serviceManager;
         private readonly ILogger<UserController> _logger;
 
         public UserController(
-            IUserService userService,
-            IUserIpAdresesService userIpAdresesService,
+            IServiceManager serviceManager,
             ILogger<UserController> logger)
         {
-            _userService = userService;
-            _userIpAdresesService = userIpAdresesService;
+            _serviceManager = serviceManager;
             _logger = logger;
         }
 
@@ -27,9 +24,9 @@
         public async Task<IActionResult> InitUserConnection([FromBody] ConnectionRequest request)
         {
             _logger.LogTrace("InitUserConnection started");
-            var user = await _userService.CreateUserWithIp(request.UserId, request.IpAddress);
+            var user = await _serviceManager.UserService.CreateUserWithIpAsync(request.UserId, request.IpAddress);
 
-            await _userIpAdresesService.AddUserWithIpAsync(user);
+            await _serviceManager.UserIpAdresesCacheService.AddUserIpsAsync(user);
             return Ok("User with IP address created.");
         }
 
@@ -38,7 +35,7 @@
             [FromQuery][Required] string ipPrefix)
         {
             _logger.LogTrace("FindUsersByIpPrefix started");
-            var users = await _userIpAdresesService.FindUsersByIpPrefixAsync(ipPrefix);
+            var users = await _serviceManager.UserIpAdresesCacheService.FindUsersByIpPrefixAsync(ipPrefix);
             _logger.LogTrace("FindUsersByIpPrefix finished");
 
             return Ok(users);
@@ -46,10 +43,10 @@
 
         [HttpGet("{userId}/ips")]
         public async Task<IActionResult> GetUserIpAddresses(
-            [FromQuery][Required] long userId)
+            [Required] long userId)
         {
             _logger.LogTrace("GetUserIpAddresses started");
-            var ips = await _userIpAdresesService.GetUserIpsAsync(userId);
+            var ips = await _serviceManager.UserIpAdresesCacheService.GetAllIpsByUserIdAsync(userId);
             _logger.LogTrace("GetUserIpAddresses finished");
 
             return Ok(ips);
@@ -57,10 +54,10 @@
 
         [HttpGet("{userId}/last-connection")]
         public async Task<IActionResult> GetLastConnection(
-            [FromQuery][Required] long userId)
+            [Required] long userId)
         {
             _logger.LogTrace("GetLastConnection started");
-            var lastConnection = await _userService.GetLastConnectionAsync(userId);
+            var lastConnection = await _serviceManager.UserService.GetLastConnectionAsync(userId);
             _logger.LogTrace("GetLastConnection finished");
 
             return Ok(lastConnection);

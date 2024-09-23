@@ -7,19 +7,19 @@
     using UserIpCollector.Abstractions.Interfaces;
     using UserIpCollector.Data.Entities;
 
-    public class UserIpAdresesService : IUserIpAdresesService
+    public class UserIpAdresesCacheService : IUserIpAdresesCacheService
     {
         private readonly IDistributedCache _cache;
-        private readonly IUserService _userService;
-        private readonly ILogger<UserIpAdresesService> _logger;
+        private readonly IRepositoryManager _repositoryManager;
+        private readonly ILogger<UserIpAdresesCacheService> _logger;
 
-        public UserIpAdresesService(
+        public UserIpAdresesCacheService(
             IDistributedCache cache,
-            IUserService userService,
-            ILogger<UserIpAdresesService> logger)
+            IRepositoryManager repositoryManager,
+            ILogger<UserIpAdresesCacheService> logger)
         {
             _cache = cache;
-            _userService = userService;
+            _repositoryManager = repositoryManager;
             _logger = logger;
         }
 
@@ -34,7 +34,7 @@
                 return JsonConvert.DeserializeObject<List<User>>(cachedUsers);
             }
 
-            var users = await _userService.FindUsersByPartialIpAsync(ipPrefix);
+            var users = await _repositoryManager.UserRepository.FindUsersByPartialIpAsync(ipPrefix);
 
             await _cache.SetStringAsync(cacheKey, JsonConvert.SerializeObject(users),
                 new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1) });
@@ -42,7 +42,7 @@
             return users;
         }
 
-        public async Task AddUserWithIpAsync(User user)
+        public async Task AddUserIpsAsync(User user)
         {
             var key = $"user:ips:{user.Id}";
             _logger.LogTrace($"Adding user and his IP to cache has started by key {key}");
@@ -54,13 +54,13 @@
             await SetCacheAsync(key, userIps);
         }
 
-        public async Task<List<UserIpAddress>> GetUserIpsAsync(long userId)
+        public async Task<List<UserIpAddress>> GetAllIpsByUserIdAsync(long userId)
         {
             var key = $"alluser:ips:{userId}";
             var cached = await GetCacheAsync<List<UserIpAddress>>(key) ?? new List<UserIpAddress>();
-            if (cached.Count == 0)
+            if (!cached.Any())
             {
-                var userIps = await _userService.GetAllUserIpAddressesAsync(userId);
+                var userIps = await _repositoryManager.UserIpAddressRepository.GetAllIpsByUserIdAsync(userId);
                 await SetCacheAsync(key, userIps);
                 return userIps;
             }

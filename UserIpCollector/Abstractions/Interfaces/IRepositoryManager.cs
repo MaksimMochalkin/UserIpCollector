@@ -2,5 +2,7 @@
 {
     public interface IRepositoryManager
     {
+        IUserRepository UserRepository { get; }
+        IUserIpAdresesRepository UserIpAddressRepository { get; }
     }
 }
