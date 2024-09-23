@@ -54,6 +54,33 @@
             await SetCacheAsync(key, userIps);
         }
 
+        public async Task<List<UserIpAddress>> GetIpsByKeyFromCacheAsync(string key)
+        {
+            _logger.LogTrace($"Getting user's IP from cache has started by key {key}");
+
+            var userIps = await GetCacheAsync<List<UserIpAddress>>(key) ?? new List<UserIpAddress>();
+
+            return userIps;
+        }
+
+        public async Task<User?> GetUserByKeyFromCacheAsync(string key)
+        {
+            _logger.LogTrace($"Getting user from cache has started by key {key}");
+
+            var user = await GetCacheAsync<User>(key);
+
+            return user;
+        }
+
+        public async Task<List<User>?> GetAllUsersByIpPrefixKeyFromCacheAsync(string key)
+        {
+            _logger.LogTrace($"Getting all user from cache has started by ip prefix key {key}");
+
+            var user = await GetCacheAsync<List<User>>(key);
+
+            return user;
+        }
+
         public async Task<List<UserIpAddress>> GetAllIpsByUserIdAsync(long userId)
         {
             var key = $"alluser:ips:{userId}";

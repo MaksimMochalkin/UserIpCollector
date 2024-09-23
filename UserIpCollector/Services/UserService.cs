@@ -4,6 +4,7 @@
     using System.Threading.Tasks;
     using UserIpCollector.Abstractions.Interfaces;
     using UserIpCollector.Data.Entities;
+    using UserIpCollector.Managers;
 
     public class UserService : IUserService
     {
