@@ -49,7 +49,7 @@ namespace UserIpCollector.Tests
         }
 
         [Fact]
-        public async Task GetAllUserIpAddresses_ShouldReturnUserIps()
+        public async Task GetLastConnection_ShouldReturnLastConnection()
         {
             // Arrange
             _dbHelper.SeedData();
