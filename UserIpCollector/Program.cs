@@ -7,7 +7,6 @@ using UserIpCollector.Helpers;
 using UserIpCollector.Managers;
 using UserIpCollector.Middleware;
 using UserIpCollector.Repositories;
-using UserIpCollector.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,15 +23,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(config =>
 });
 
 builder.Services.AddDistributedMemoryCache();
-//builder.Services.AddMemoryCache();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
 builder.Services.AddScoped<IServiceManager, ServiceManager>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-//builder.Services.AddScoped<IUserService, UserService>();
-//builder.Services.AddScoped<IUserIpAdresesCacheService, UserIpAdresesCacheService>();
 
 var app = builder.Build();
 
